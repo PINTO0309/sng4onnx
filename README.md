@@ -6,6 +6,10 @@ https://github.com/PINTO0309/simple-onnx-processing-tools
 
 [![Downloads](https://static.pepy.tech/personalized-badge/sng4onnx?period=total&units=none&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/sng4onnx) ![GitHub](https://img.shields.io/github/license/PINTO0309/sng4onnx?color=2BAF2B) [![PyPI](https://img.shields.io/pypi/v/sng4onnx?color=2BAF2B)](https://pypi.org/project/sng4onnx/) [![CodeQL](https://github.com/PINTO0309/sng4onnx/workflows/CodeQL/badge.svg)](https://github.com/PINTO0309/sng4onnx/actions?query=workflow%3ACodeQL)
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/33194443/195636410-a797d847-365a-469e-8bdd-7a3abb8aa3fd.png" />
+</p>
+
 # Key concept
 
 - [x] Automatically generates and assigns an OP name to each OP in an old format ONNX file.
