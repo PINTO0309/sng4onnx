@@ -79,6 +79,12 @@ def generate(
         onnx_graph = onnx.load(input_onnx_file_path)
     domain: str = onnx_graph.domain
     ir_version: int = onnx_graph.ir_version
+    meta_data = {'domain': domain, 'ir_version': ir_version}
+    if hasattr(onnx_graph, 'metadata_props'):
+        metadata_props = [metadata_prop for metadata_prop in onnx_graph.metadata_props]
+        if len(metadata_props) > 0:
+            metadata_props_dict = {metadata_prop.key: metadata_prop.value for metadata_prop in metadata_props}
+            meta_data = {**meta_data, **metadata_props_dict}
     graph = gs.import_onnx(onnx_graph)
     graph.cleanup().toposort()
 
@@ -96,7 +102,7 @@ def generate(
     # Shape Estimation
     renamed_graph = None
     try:
-        renamed_graph = onnx.shape_inference.infer_shapes(gs.export_onnx(graph, do_type_check=False, **{'domain': domain, 'ir_version': ir_version}))
+        renamed_graph = onnx.shape_inference.infer_shapes(gs.export_onnx(graph, do_type_check=False, **meta_data))
     except:
         renamed_graph = gs.export_onnx(graph)
         if not non_verbose:
