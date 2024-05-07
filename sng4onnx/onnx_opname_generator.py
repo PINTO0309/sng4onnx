@@ -80,11 +80,9 @@ def generate(
     domain: str = onnx_graph.domain
     ir_version: int = onnx_graph.ir_version
     meta_data = {'domain': domain, 'ir_version': ir_version}
+    metadata_props = None
     if hasattr(onnx_graph, 'metadata_props'):
-        metadata_props = [metadata_prop for metadata_prop in onnx_graph.metadata_props]
-        if len(metadata_props) > 0:
-            metadata_props_dict = {metadata_prop.key: metadata_prop.value for metadata_prop in metadata_props}
-            meta_data = {**meta_data, **metadata_props_dict}
+        metadata_props = onnx_graph.metadata_props
     graph = gs.import_onnx(onnx_graph)
     graph.cleanup().toposort()
 
@@ -102,9 +100,14 @@ def generate(
     # Shape Estimation
     renamed_graph = None
     try:
-        renamed_graph = onnx.shape_inference.infer_shapes(gs.export_onnx(graph, do_type_check=False, **meta_data))
-    except:
-        renamed_graph = gs.export_onnx(graph)
+        exported_onnx_graph = gs.export_onnx(graph, do_type_check=False, **meta_data)
+        if metadata_props is not None:
+            exported_onnx_graph.metadata_props.extend(metadata_props)
+        renamed_graph = onnx.shape_inference.infer_shapes(exported_onnx_graph)
+    except Exception as ex:
+        renamed_graph = gs.export_onnx(graph, do_type_check=False, **meta_data)
+        if metadata_props is not None:
+            exported_onnx_graph.metadata_props.extend(metadata_props)
         if not non_verbose:
             print(
                 f'{Color.YELLOW}WARNING:{Color.RESET} '+
