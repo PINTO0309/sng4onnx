@@ -3,6 +3,7 @@
 import sys
 from argparse import ArgumentParser
 import onnx
+from onnx.external_data_helper import uses_external_data
 import onnx_graphsurgeon as gs
 from typing import Optional
 
@@ -31,11 +32,32 @@ class Color:
     BG_DEFAULT     = '\033[49m'
     RESET          = '\033[0m'
 
+def model_uses_external_data(input_onnx_file_path: str) -> bool:
+    model = onnx.load(input_onnx_file_path, load_external_data=False)
+    def iter_tensors_in_graph(g):
+        for t in g.initializer:
+            yield t
+        for t in g.sparse_initializer:
+            yield t
+        for n in g.node:
+            for a in n.attribute:
+                if a.type == onnx.AttributeProto.TENSOR:
+                    yield a.t
+                elif a.type == onnx.AttributeProto.TENSORS:
+                    for t in a.tensors:
+                        yield t
+                elif a.type == onnx.AttributeProto.GRAPH:
+                    yield from iter_tensors_in_graph(a.g)
+                elif a.type == onnx.AttributeProto.GRAPHS:
+                    for sg in a.graphs:
+                        yield from iter_tensors_in_graph(sg)
+    return any(uses_external_data(t) for t in iter_tensors_in_graph(model.graph))
 
 def generate(
     input_onnx_file_path: Optional[str] = '',
     onnx_graph: Optional[onnx.ModelProto] = None,
     output_onnx_file_path: Optional[str] = '',
+    has_external_data: Optional[bool] = False,
     non_verbose: Optional[bool] = False,
 ) -> onnx.ModelProto:
     """
@@ -54,6 +76,9 @@ def generate(
     output_onnx_file_path: Optional[str]
         Output onnx file path. If not specified, no ONNX file is output.\n\
         Default: ''
+
+    has_external_data: Optional[bool]
+        Default: False
 
     non_verbose: Optional[bool]
         Do not show all information logs. Only error logs are displayed.\n\
@@ -103,7 +128,10 @@ def generate(
         exported_onnx_graph = gs.export_onnx(graph, do_type_check=False, **meta_data)
         if metadata_props is not None:
             exported_onnx_graph.metadata_props.extend(metadata_props)
-        renamed_graph = onnx.shape_inference.infer_shapes(exported_onnx_graph)
+        if not has_external_data:
+            renamed_graph = onnx.shape_inference.infer_shapes(exported_onnx_graph)
+        else:
+            renamed_graph = exported_onnx_graph
     except Exception as ex:
         renamed_graph = gs.export_onnx(graph, do_type_check=False, **meta_data)
         if metadata_props is not None:
@@ -156,12 +184,15 @@ def main():
 
     # Load
     onnx_graph = onnx.load(input_onnx_file_path)
+    # External Data Check
+    has_external_data = model_uses_external_data(input_onnx_file_path)
 
     # OP add
     renamed_graph = generate(
         input_onnx_file_path=None,
         onnx_graph=onnx_graph,
         output_onnx_file_path=output_onnx_file_path,
+        has_external_data=has_external_data,
         non_verbose=non_verbose,
     )
 

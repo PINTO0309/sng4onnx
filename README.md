@@ -1,5 +1,5 @@
 # sng4onnx
-A simple tool that automatically generates and assigns an OP name to each OP in an old format ONNX file.  
+A simple tool that automatically generates and assigns an OP name to each OP in an old format ONNX file.
 **S**imple op **N**ame **G**enerator for **ONNX**.
 
 https://github.com/PINTO0309/simple-onnx-processing-tools
@@ -64,6 +64,7 @@ generate(
     input_onnx_file_path: Union[str, NoneType] = '',
     onnx_graph: Union[onnx.onnx_ml_pb2.ModelProto, NoneType] = None,
     output_onnx_file_path: Union[str, NoneType] = '',
+    has_external_data: Optional[bool] = False,
     non_verbose: Union[bool, NoneType] = False
 ) -> onnx.onnx_ml_pb2.ModelProto
 
@@ -82,6 +83,9 @@ generate(
     output_onnx_file_path: Optional[str]
         Output onnx file path. If not specified, no ONNX file is output.
         Default: ''
+
+    has_external_data: Optional[bool]
+        Default: False
 
     non_verbose: Optional[bool]
         Do not show all information logs. Only error logs are displayed.
