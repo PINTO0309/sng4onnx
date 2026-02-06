@@ -4,7 +4,17 @@ import sys
 from argparse import ArgumentParser
 import onnx
 from onnx.external_data_helper import uses_external_data
-import onnx_graphsurgeon as gs
+try:
+    from . import gs
+except Exception:
+    # Fallback for direct execution (e.g., `python sng4onnx/onnx_opname_generator.py`)
+    import os
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    if parent_dir not in sys.path:
+        sys.path.insert(0, parent_dir)
+    from sng4onnx import gs
 from typing import Optional
 
 class Color:
