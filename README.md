@@ -22,9 +22,7 @@ $ echo export PATH="~/.local/bin:$PATH" >> ~/.bashrc \
 && source ~/.bashrc
 
 ### run
-$ pip install -U onnx \
-&& python3 -m pip install -U onnx_graphsurgeon --index-url https://pypi.ngc.nvidia.com \
-&& pip install -U sng4onnx
+$ pip install -U onnx sng4onnx
 ```
 ### 1-2. Docker
 https://github.com/PINTO0309/simple-onnx-processing-tools#docker
@@ -124,10 +122,8 @@ https://github.com/onnx/models/blob/main/vision/classification/resnet/model/resn
 
 ## 7. Reference
 1. https://github.com/onnx/onnx/blob/main/docs/Operators.md
-2. https://docs.nvidia.com/deeplearning/tensorrt/onnx-graphsurgeon/docs/index.html
-3. https://github.com/NVIDIA/TensorRT/tree/main/tools/onnx-graphsurgeon
-4. https://github.com/PINTO0309/simple-onnx-processing-tools
-5. https://github.com/PINTO0309/PINTO_model_zoo
+2. https://github.com/PINTO0309/simple-onnx-processing-tools
+3. https://github.com/PINTO0309/PINTO_model_zoo
 
 ## 8. Issues
 https://github.com/PINTO0309/simple-onnx-processing-tools/issues
